@@ -3,39 +3,94 @@ import pygame
 import tkinter as tk
 
 
-
 class cube(object):
     rows = 20
     w = 500
     def __init__(self, start, dirnx = 1, dirny = 0, color = (255, 0, 0)):
-        pass
+        self.pos = start
+        self.dirnx = dirnx
+        self.dirny = dirny
+        self.color = color
     
     def move(self, dirnx, dirny):
-        pass
+        self.dirnx = dirnx
+        self.dirny = dirny
+        self.pos = (self.pos[0] + self.dirnx, self.pos[1] + self.dirny)
     
     def draw(self, surface, eyes = False):
-        pass
-    
+        dis = self.w // self.rows
+        i = self.pos[0]
+        j = self.pos[1]
+        pygame.draw.rect(surface, self.color, (i*dis + 1, j*dis + 1, dis - 2, dis - 2))
+        if eyes:
+            centre = dis // 2
+            radius = 3
+            circleMiddle = (i * dis + centre - radius,  j*dis + 8)
+            circleMiddl2 = (i * dis + dis - 2*radius,   j*dis + 8)
+            pygame.draw.circle(surface, (0, 0, 0), circleMiddle, radius)
+            pygame.draw.circle(surface, (0, 0, 0), circleMiddl2, radius)
+             
+         
+
+#=============================================================================    
 class snake(object):
     body = []
     turns = {}
     def __init__(self, color, pos):
-        pass
+        self.color = color
+        self.head = cube(pos)
+        self.body.append(self.head)
+        self.dirnx = 0
+        self.dirny = 1
+    
+    def reset(self, pos):
+        self.head = cube(pos)
+        self.body = []
+        self.body.append(self.head)
+        self.turns = {}
+        self.dirnx = 0
+        self.dirny = 1
     
     def move(self):
-        pass
-    
-    
-    
-    
-    
-    
-    
-    
-    def reset(self):
-        pass
-    
-    def addcube(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            # Button pressed by user
+            keys = pygame.key.get_pressed()
+            for key in keys:
+                if keys[pygame.K_LEFT]:
+                    self.dirnx = -1
+                    self.dirny = 0
+                elif keys[pygame.K_RIGHT]:
+                    self.dirnx = 1
+                    self.dirny = 0
+                elif keys[pygame.K_UP]:
+                    self.dirnx = 0
+                    self.dirny = -1
+                elif keys[pygame.K_DOWN]:
+                    self.dirnx = 0
+                    self.dirny = 1
+                # SAVE IT IN DICO FOR SNAKE TO MOVE AFTER HEAD
+                self.turns[self.head.pos[:]] = [self.dirnx, self.dirny]
+        #
+        for i, c in enumerate(self.body):
+            p = c.pos[:]
+            if p in self.turns:
+                turn = self.turns[p]
+                c.move(turn[0], turn[1])
+                # WHEN ARRIVE AT TAILS, we remove the turn {position: direction}
+                if i == len(self.body) - 1:  
+                    self.turns.pop(p)
+            else:
+                if c.dirnx == -1    and c.pos[0] <= 0:              c.pos = (c.rows - 1, c.pos[1])
+                elif c.dirnx == 1   and c.pos[0] >= c.rows - 1:     c.pos = (0, c.pos[1])
+                elif c.dirny == 1   and c.pos[1] >= c.rows - 1:     c.pos = (c.pos[0], 0)
+                elif c.dirny == -1  and c.pos[1] <= 0:              c.pos = (c.pos[0], c.rows - 1)
+                else:
+                    c.move(c.dirnx, c.dirny)
+                
+                
+    def addCube(self):
         tail = self.body[-1]
         dx, dy = tail.dirnx, tail.dirny
         # Add Tail after Tail
@@ -57,7 +112,7 @@ class snake(object):
             else:       c.draw(surface)
               
             
-            
+#=============================================================================            
 def drawGrid(w, rows, surface):
     sizeBtwn = w // rows
     x = 0
@@ -88,12 +143,18 @@ def randomSnack(rows, item):
     return (x,y)
     
 def message_box(subject, content):
-    pass
+    root = tk.Tk()
+    root.attributes("-topmost", True)
+    root.withdraw()
+    tk.messagebox.showinfo(subject, content)
+    try:
+        root.destroy()
+    except: pass
     
 def main():
     global width, rows, s, snack
     width = 500
-    rows = 10
+    rows = 20
     win = pygame.display.set_mode((width, width))
     s = snake ((255, 0, 0), (10, 10))
     snack = cube(randomSnack(rows, s), color = (0,255,0))
@@ -112,9 +173,9 @@ def main():
             snack = cube(randomSnack(rows, s), color = (0,255,0))
         # IF HEAD BITE BODY
         for x in range(len(s.body)):
-            if s.body[x].pos in list(map(lambda z:z.pos, s.boady[x+1:])):
+            if s.body[x].pos in list(map(lambda z:z.pos, s.body[x+1:])):
                 print('Score: ', len(s.body))
-                message_box()
+                message_box('You lost','Try Again ?')
                 s.reset((10, 10))
                 break        
         
