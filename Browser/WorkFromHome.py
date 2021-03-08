@@ -12,9 +12,9 @@ while True:
         if o_pos.y > 1000:      pyautogui.moveTo(o_pos.x , 0)
         elif o_pos.x > 1000:    pyautogui.moveTo(0 , o_pos.y)
         else:                   pyautogui.moveTo(o_pos.x + 10, o_pos.y + 50)
-        print(o_pos.x, o_pos.y)
+        # print(o_pos.x, o_pos.y)
     # Press Shift
-    print('------------------')
     pyautogui.press('shift')
+    # print('------------------')
     
     
