@@ -107,9 +107,7 @@ class c_secCam():
         # Close
         self.closeCam()
         
-        
-dir_current = os.getcwd()
-print(dir_current)
+    
             
 # Launch the class            
 i_secCam = c_secCam(6)
