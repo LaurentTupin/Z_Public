@@ -7,7 +7,7 @@ import datetime as dt
 
 
 class c_secCam():
-    def __init__(self, int_whatToDisplay = 0):
+    def __init__(self, int_whatToDisplay = 100):
         import cv2
         import winsound
         self.o_sound = winsound
@@ -16,9 +16,13 @@ class c_secCam():
         self.__okFlag = True
         self.__cam = cv2.VideoCapture(0)
         self.__lWhatToDisplay = ['cam', 'diff', 'gray','blur','thresh','cube','contour']
-        self.__whatToDisplay = self.__lWhatToDisplay[int_whatToDisplay]
+        try:
+            self.__whatToDisplay = self.__lWhatToDisplay[int_whatToDisplay]
+        except:
+            self.__whatToDisplay = 'Security Camera'
         self.__nowSave = dt.datetime(2000, 1, 2)
         self.__nowSend = dt.datetime(2000, 1, 2)
+        self.__numPicturesSaved = 0
         
     def closeCam(self):
         self.__cam.release()
@@ -51,7 +55,7 @@ class c_secCam():
         Cubic = self.o_cv.dilate(self.GetThresh(), None, iterations = 3)
         return Cubic
     
-    def GetContours(self, bl_ignoreSmallMove = True, bl_soundAlert = False):
+    def GetContours(self, bl_ignoreSmallMove = True, bl_soundAlert = False, bl_saveImage = False):
         cv = self.o_cv
         sound = self.o_sound
         frame = self.GetFrame()
@@ -59,7 +63,8 @@ class c_secCam():
         for c in contours:
             if bl_ignoreSmallMove:
                 if cv.contourArea(c) > 5000:
-                    self.TakePicture()
+                    if bl_saveImage:
+                        self.TakePicture()
                     if bl_soundAlert:
                         sound.Beep(500, 200)
                 else:   continue
@@ -74,8 +79,9 @@ class c_secCam():
     
     def TakePicture(self):
         dte_now, str_now = self.GetNow()
-        if (dte_now - self.__nowSave).total_seconds() > 30:
+        if (dte_now - self.__nowSave).total_seconds() > 30 * (self.__numPicturesSaved + 1):
             self.__nowSave = dte_now
+            self.__numPicturesSaved += 1
             cv = self.o_cv
             frame = self.GetFrame()
             str_path = os.path.join(os.getcwd(), r'Captures\cam_{}.png'.format(str_now))
@@ -94,23 +100,33 @@ class c_secCam():
         elif str_whatToDisplay == 'thresh': o_toDisplay = self.GetThresh()
         elif str_whatToDisplay == 'cube':   o_toDisplay = self.GetCube()
         elif str_whatToDisplay == 'contour':o_toDisplay = self.GetContours()
+        else:
+            # Security Camera (do not display on screen)
+            o_toDisplay = self.GetContours(bl_saveImage = True)
+            self.o_cv.imshow(self.__nameCam, 0)
+            return 0
         # DISPLAY
         self.o_cv.imshow(self.__nameCam, o_toDisplay)
         
     def LoopOfVerification(self):
         ok_flag = self.__okFlag
+        STOP_KEYBOARD = 'q'
         while self.__cam.isOpened() and ok_flag:
-            if self.o_cv.waitKey(10) == ord('q'):
+            if self.o_cv.waitKey(10) == ord(STOP_KEYBOARD):
                 ok_flag = False
+            
+            
+            
             else:
                 self.displayFrame(self.__whatToDisplay)    
         # Close
         self.closeCam()
-        
     
+    def __del__(self):
+        self.closeCam()
             
 # Launch the class            
-i_secCam = c_secCam(6)
+i_secCam = c_secCam()
 i_secCam.LoopOfVerification()
        
    
