@@ -79,7 +79,7 @@ class c_secCam():
     
     def TakePicture(self):
         dte_now, str_now = self.GetNow()
-        if (dte_now - self.__nowSave).total_seconds() > 30 * (self.__numPicturesSaved + 1):
+        if (dte_now - self.__nowSave).total_seconds() > 2 * (self.__numPicturesSaved + 1):
             self.__nowSave = dte_now
             self.__numPicturesSaved += 1
             cv = self.o_cv
@@ -109,14 +109,11 @@ class c_secCam():
         self.o_cv.imshow(self.__nameCam, o_toDisplay)
         
     def LoopOfVerification(self):
-        ok_flag = self.__okFlag
+        ok_flag = self.__okFlagq
         STOP_KEYBOARD = 'q'
         while self.__cam.isOpened() and ok_flag:
             if self.o_cv.waitKey(10) == ord(STOP_KEYBOARD):
                 ok_flag = False
-            
-            
-            
             else:
                 self.displayFrame(self.__whatToDisplay)    
         # Close
@@ -125,8 +122,10 @@ class c_secCam():
     def __del__(self):
         self.closeCam()
             
+        
+        
 # Launch the class            
-i_secCam = c_secCam()
+i_secCam = c_secCam(4)
 i_secCam.LoopOfVerification()
        
    
