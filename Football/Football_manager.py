@@ -111,7 +111,7 @@ def f_BuildTeams(d_players, bl_print = False):
 #=============================================================================
 
 # Get the PLayers
-df_players = pd.read_excel(r'C:\Users\laurent.tupin\Documents\GitHub\0_CompanyCopy\IHSMarkit\SCAA Tuesdays Football.xlsx', 
+df_players = pd.read_excel(r'..\..\0_CompanyCopy\IHSMarkit\SCAA Tuesdays Football.xlsx', 
                            sheet_name = 'Team', header = 0, index_col = None)
 d_players = {}
 for index, row in df_players.iterrows():
