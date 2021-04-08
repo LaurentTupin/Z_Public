@@ -3,7 +3,11 @@ from statistics import mean
 import random
 
 
-
+def display_teamList(l_team):
+    for play in l_team:
+        print(play)
+    print('')
+    
 def display_team(ddd):
     for play in ddd.items():
         print('   ', play)
@@ -36,10 +40,10 @@ def f_BuildTeams(d_players, bl_print = False):
     int_ColorScore += d_players['Randolf']
     del d_players['Randolf']
     
-    # Second Player in White team
-    l_teamWhite.append('_Roland')
-    int_WhiteScore += d_players['_Roland']
-    del d_players['_Roland']
+    # # Second Player in White team
+    # l_teamWhite.append('_Roland')
+    # int_WhiteScore += d_players['_Roland']
+    # del d_players['_Roland']
     
     
     # Fill the team in a loop
@@ -54,9 +58,9 @@ def f_BuildTeams(d_players, bl_print = False):
             if bl_print:    print(' White team...')
             int_gapToFillForWhite = int_ColorScore - int_WhiteScore
             if bl_print:    print('   Gap to fill...', int_gapToFillForWhite)
-            d_players_level = {k : abs(v-int_gapToFillForWhite) for (k,v) in d_players.items()}
+            d_players_level = {play : abs(rate - int_gapToFillForWhite) for (play, rate) in d_players.items()}
             if bl_print:    display_team(d_players_level)
-            d_players_level = {k : abs(v-int_gapToFillForWhite) * i_numPlayer for (k,v) in d_players.items()}
+            d_players_level = {play : abs(rate - int_gapToFillForWhite) * i_numPlayer for (play, rate) in d_players.items()}
             if bl_print:    display_team(d_players_level)
             # str_player = min(d_players_level, key = d_players_level.get)
             # print('   ', str_player)
@@ -78,13 +82,13 @@ def f_BuildTeams(d_players, bl_print = False):
             if bl_print:    print(' color team...')
             int_whiteAdvantage = int_WhiteScore - int_ColorScore
             if bl_print:    print('   White advantage...', int_whiteAdvantage)
-            flt_avgLevelPlayers = round(mean(d_players.values()), 1)
+            flt_avgLevelPlayers = round(max(d_players.values()), 1)
             if bl_print:    print('   Average level or remaining player...', flt_avgLevelPlayers)
             flt_levelWanted = round(flt_avgLevelPlayers + int_whiteAdvantage, 2)
             if bl_print:    print('   Level wanted for a new player...', flt_levelWanted)
-            d_players_level = {k : round(abs(v-flt_levelWanted), 1)  for (k,v) in d_players.items()} 
+            d_players_level = {play : round(abs(rate - flt_levelWanted), 1)  for (play, rate) in d_players.items()} 
             if bl_print:    display_team(d_players_level)
-            d_players_level = {k : round(abs(v-flt_levelWanted) * i_numPlayer, 1)  for (k,v) in d_players.items()} 
+            d_players_level = {play : round(abs(rate - flt_levelWanted) * i_numPlayer, 1)  for (play, rate) in d_players.items()} 
             if bl_print:    display_team(d_players_level)
             # str_player = min(d_players_level, key = d_players_level.get)
             # print('   ', str_player)
@@ -118,10 +122,14 @@ display_team(d_players)
 # Make the team
 l_teamWhite, int_WhiteScore, l_teamColor, int_ColorScore = f_BuildTeams(d_players, bl_print = False)
 
-print(' Color team:', l_teamColor)
+print(' Color team: ')
+display_teamList(l_teamColor)
+print(' White team:')
+display_teamList(l_teamWhite)
 print('  * Color score:', int_ColorScore, '\n')
-print(' White team:', l_teamWhite)
 print('  * White score:', int_WhiteScore, '\n')
+
+
 
 
 
